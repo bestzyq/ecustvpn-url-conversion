@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网址转换</title>
+    <!-- 引入 Bootstrap CSS 文件 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* 自定义样式 */
+        .container {
+            padding: 20px;
+        }
+        #convertedUrl {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">华理VPN网址转换工具</h1>
+        <div class="form-group">
+            <label for="inputUrl">输入原始网址（请输入以http://或者https://开头的网址。如有端口号，必须端口号后面有/，如':8118/'）：</label>
+            <input type="text" class="form-control" id="inputUrl" placeholder="http://www.baidu.com">
+        </div>
+        <div class="form-group">
+            <button class="btn btn-primary btn-block" onclick="convertUrl()">转换</button>
+        </div>
+        <div class="form-group">
+            <p>转换后的网址：</p>
+            <p id="convertedUrl"></p>
+            <p>特别说明，您的统一身份认证账号密码信息不经过本网站，本站仅提供链接转换服务。如您遗忘统一身份认证账号密码，请咨询信息办</p>
+        </div>
+    </div>
+
+    <!-- 引入 Bootstrap JS 文件 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.1/js/bootstrap.min.js"></script>
+    <script>
+        function convertUrl() {
+            let inputUrl = document.getElementById("inputUrl").value.trim(); // 移除前后空格
+            let convertedUrl = "https://"; // 默认以https开头
+            let isHttps = false; // 标记是否是https
+            let isPort = false; // 标记是否存在端口号
+
+            // 检查是否存在端口号
+            if (inputUrl.match(/:\d+\//)) {
+                isPort = true;
+            }
+
+            if (inputUrl === "") {
+                convertedUrl += "请输入有效的URL";
+            } else {
+                let match = inputUrl.match(/^(https?:\/\/)?([^\/]+)(\/.*)?$/);
+                if (match) {
+                    isHttps = match[1] === "https://"; // 判断是否是https
+                    let domain = match[2].replace(/[.:\/]/g, "-");
+                    let path = match[3] || "/";
+                    
+                    // 处理端口号
+                    if (!isHttps && inputUrl.match(/:\d+\//)) {
+                        let port = inputUrl.match(/:(\d+)\//)[1];
+                        path = path.replace(":" + port + "/", "-" + port + "-p");
+                    }
+
+                    convertedUrl += domain + (isPort ? "-p" : "") + (isHttps ? "-s" : "") + ".sslvpn.ecust.edu.cn:8118" + path;
+                } else {
+                    convertedUrl += "请输入有效的URL";
+                }
+            }
+            
+            // 获取显示结果的元素
+            let convertedUrlElement = document.getElementById("convertedUrl");
+            
+            // 创建超链接元素
+            let linkElement = document.createElement("a");
+            linkElement.href = convertedUrl;
+            linkElement.textContent = convertedUrl;
+            
+            // 清空显示结果的元素，并添加超链接元素
+            convertedUrlElement.innerHTML = "";
+            convertedUrlElement.appendChild(linkElement);
+        }
+    </script>
+</body>
+</html>
